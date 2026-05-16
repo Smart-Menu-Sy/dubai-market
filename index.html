@@ -13,12 +13,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/app.css" />
+  <link rel="stylesheet" href="app.css" />
 </head>
 <body>
 <div id="app" class="app">
 
-  <!-- SPLASH -->
   <div id="splash" class="splash">
     <div class="splash-inner">
       <div class="splash-logo-wrap">
@@ -30,7 +29,6 @@
     </div>
   </div>
 
-  <!-- HEADER -->
   <header id="header" class="header">
     <div class="header-row">
       <div class="brand">
@@ -73,7 +71,6 @@
     </div>
   </header>
 
-  <!-- MAIN SHOP VIEW -->
   <main id="shop-view" class="main-view">
     <div id="promo-banner" class="promo-banner">
       <div class="promo-text">
@@ -91,7 +88,6 @@
     </div>
   </main>
 
-  <!-- ORDERS VIEW -->
   <main id="orders-view" class="main-view hidden" aria-hidden="true">
     <div class="page-header">
       <h2 class="page-title">My Orders <span class="page-ar">طلباتي</span></h2>
@@ -99,7 +95,6 @@
     <div id="orders-list" class="orders-list"></div>
   </main>
 
-  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-item active" data-view="shop">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -116,7 +111,6 @@
   </nav>
 </div>
 
-<!-- CART DRAWER -->
 <div id="overlay" class="overlay hidden"></div>
 <aside id="cart-drawer" class="drawer hidden" role="dialog" aria-modal="true" aria-label="Shopping cart">
   <div class="drawer-head">
@@ -129,7 +123,6 @@
   <div id="cart-footer" class="drawer-foot"></div>
 </aside>
 
-<!-- CHECKOUT MODAL -->
 <div id="checkout-overlay" class="overlay hidden"></div>
 <div id="checkout-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Checkout">
   <div class="modal-head">
@@ -174,7 +167,6 @@
   </div>
 </div>
 
-<!-- ADMIN DRAWER -->
 <div id="admin-overlay" class="overlay hidden"></div>
 <aside id="admin-drawer" class="drawer admin-drawer hidden" role="dialog" aria-modal="true" aria-label="Admin panel">
   <div class="drawer-head">
@@ -184,7 +176,6 @@
     </button>
   </div>
 
-  <!-- Admin login gate -->
   <div id="admin-gate" class="admin-gate drawer-body">
     <div class="gate-wrap">
       <span class="gate-icon">🔐</span>
@@ -195,7 +186,6 @@
     </div>
   </div>
 
-  <!-- Admin panel content (hidden until login) -->
   <div id="admin-panel" class="hidden" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
     <div class="admin-tabs">
       <button class="admin-tab active" data-tab="products">Products</button>
@@ -206,18 +196,15 @@
 
     <div class="drawer-body admin-body" style="flex:1;overflow-y:auto">
 
-      <!-- Tab: Products -->
       <div id="tab-products" class="tab-pane">
         <input id="admin-filter" type="search" class="form-input form-input--sm mb-12" placeholder="Filter products…" />
         <div id="admin-product-list"></div>
       </div>
 
-      <!-- Tab: Orders -->
       <div id="tab-orders" class="tab-pane hidden">
         <div id="admin-orders-list"></div>
       </div>
 
-      <!-- Tab: Add Product -->
       <div id="tab-add" class="tab-pane hidden">
         <div class="form-group">
           <label>Name (EN) <span class="req">*</span></label>
@@ -258,47 +245,4 @@
         <p id="add-product-msg" class="form-msg hidden"></p>
       </div>
 
-      <!-- Tab: Config -->
       <div id="tab-config" class="tab-pane hidden">
-        <div class="form-group">
-          <label>Store WhatsApp Number <span class="req">*</span></label>
-          <input id="cfg-phone" type="tel" class="form-input" placeholder="971XXXXXXXXX" />
-          <small class="form-hint">Country code without +, e.g. 971501234567</small>
-        </div>
-        <div class="form-group">
-          <label>Promo Code</label>
-          <input id="cfg-promo" type="text" class="form-input" placeholder="SAVE10" />
-        </div>
-        <div class="form-group">
-          <label>Discount % (0 = disabled)</label>
-          <input id="cfg-discount" type="number" class="form-input" placeholder="10" min="0" max="100" />
-        </div>
-        <div class="form-group">
-          <label>Change Admin Password</label>
-          <input id="cfg-password" type="password" class="form-input" placeholder="New password" />
-        </div>
-        <button id="save-config-btn" class="btn-primary">Save Config</button>
-        <p id="cfg-msg" class="form-msg hidden"></p>
-        <hr class="divider" />
-        <div class="danger-zone">
-          <p class="danger-label">Danger Zone</p>
-          <button id="clear-all-btn" class="btn-danger">⚠️ Reset All App Data</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="admin-foot">
-      <button id="admin-logout-btn" class="btn-outline btn-sm">Logout</button>
-    </div>
-  </div>
-</aside>
-
-<!-- TOAST -->
-<div id="toast" class="toast hidden" role="alert" aria-live="assertive"></div>
-
-<script src="js/db.js"></script>
-<script src="js/cart.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/app.js"></script>
-</body>
-</html>
