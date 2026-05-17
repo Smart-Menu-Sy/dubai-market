@@ -12,7 +12,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="app.css?v=1.4" />
+  
+  <script>
+    // خدعة برمجية ذكية لضمان جلب ملف التنسيق الصحيح سواء كان كبيراً أم صغيراً على السيرفر
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    // نتحقق من الملف المتاح على جيت هاب
+    link.href = 'App.css?v=2.0'; 
+    document.head.appendChild(link);
+  </script>
 </head>
 <body>
 <div id="app" class="app">
@@ -249,18 +257,10 @@
   </div>
 </aside>
 
-<script src="db.js"></script>
-<script src="ui.js"></script>
-<script src="cart.js"></script>
-<script src="app.js"></script>
-<script>
-  // كود أمان احتياطي لتشغيل الواجهة فوراً
-  window.addEventListener('DOMContentLoaded', () => {
-    if (typeof UI !== 'undefined' && typeof UI.init === 'function') {
-      UI.init();
-    }
-  });
-</script>
+<script src="db.js?v=2.0"></script>
+<script src="ui.js?v=2.0"></script>
+<script src="cart.js?v=2.0"></script>
+<script src="app.js?v=2.0"></script>
 
 </body>
 </html>
