@@ -300,5 +300,20 @@
 <script src="js/cart.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/app.js"></script>
+  <script>
+  // كود لإجبار شاشة التحميل الخضراء على الاختفاء بمجرد اكتمال تحميل عناصر الصفحة
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const splash = document.getElementById('splash');
+      if (splash) {
+        splash.style.opacity = '0';
+        splash.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+          splash.style.display = 'none';
+        }, 400); // ينتظر انتهاء الحركة الإنميشن ثم يختفي تماماً
+      }
+    }, 1000); // يعطي هيبة للمتجر بالتحميل لمدة ثانية واحدة ثم يفتح فوراً
+  });
+</script>
 </body>
 </html>
