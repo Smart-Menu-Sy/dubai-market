@@ -5,15 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#1a3a2a" />
   <meta name="description" content="Dubai Supermarket – Fresh groceries delivered fast." />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Dubai Mkt" />
   <link rel="manifest" href="manifest.json" />
   <title>Dubai Supermarket | دبي سوبرماركت</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="app.css?v=1.1" />
+  <link rel="stylesheet" href="app.css?v=1.2" />
 </head>
 <body>
 <div id="app" class="app">
@@ -251,9 +250,17 @@
 </aside>
 
 <script src="db.js"></script>
-<script src="cart.js"></script>
 <script src="ui.js"></script>
+<script src="cart.js"></script>
 <script src="app.js"></script>
+<script>
+  // حل أمان إضافي لإجبار الواجهة على العمل فور اكتمال تحميل الصفحة بالكامل
+  window.addEventListener('DOMContentLoaded', () => {
+    if (typeof UI !== 'undefined' && typeof UI.init === 'function') {
+      UI.init();
+    }
+  });
+</script>
 
 </body>
 </html>
