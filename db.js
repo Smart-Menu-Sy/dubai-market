@@ -1,6 +1,6 @@
 /**
- * Products     { id, name, nameAr, category, price, imageURL, unit, emoji, available, createdAt }
- * Orders       { id, customerName, phone, address, note, items[], subtotal, discountAmt, total,
+ * Products      { id, name, nameAr, category, price, imageURL, unit, emoji, available, createdAt }
+ * Orders        { id, customerName, phone, address, note, items[], subtotal, discountAmt, total,
  * discountCode, status, createdAt, timestampFormatted }
  * Config       { storePhone, promoCode, discountPct, adminPassword }
  *
@@ -19,11 +19,11 @@
 const DB = (() => {
   /* ─── Storage keys ─── */
   const K = {
-    PRODUCTS: 'dsm_products',
-    ORDERS:   'dsm_orders',
-    CONFIG:   'dsm_config',
-    CART:     'dsm_cart',
-    SESSION:  'dsm_admin_session',
+    PRODUCTS: 'dsm_products_sy',
+    ORDERS:   'dsm_orders_sy',
+    CONFIG:   'dsm_config_sy',
+    CART:     'dsm_cart_sy',
+    SESSION:  'dsm_admin_session_sy',
   };
 
   /* ─── Helpers ─── */
@@ -32,76 +32,80 @@ const DB = (() => {
   const uid   = () => 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
   const ordId = () => 'ORD-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2,5).toUpperCase();
 
-  const fmtDate = d => new Date(d).toLocaleString('en-AE', {
+  const fmtDate = d => new Date(d).toLocaleString('ar-SY', {
     year: 'numeric', month: 'short', day: 'numeric',
     hour: '2-digit', minute: '2-digit', hour12: true
   });
 
   /* ─────────────────────────────────────────────────────────────
-     DEFAULT CONFIG (تم تعديل الرقم لعميلك في سوريا هنا)
+     DEFAULT CONFIG (الإعدادات الافتراضية المخصصة لسوريا والعملة المحلية)
   ───────────────────────────────────────────────────────────── */
   const DEFAULT_CONFIG = {
-    storePhone:    '963965436980',  // تم التعديل للصيغة الدولية الصحيحة بدون أصفار زائدة
+    storePhone:    '963965436980',  // الرقم الدولي الصحيح بدون أصفار زائدة للواتساب
     promoCode:     'DUBAI10',
     discountPct:   10,
     adminPassword: 'admin123',
+    currencyAr:    'ل.س',
+    currencyEn:    'SP'
   };
 
   /* ─────────────────────────────────────────────────────────────
-     SEED PRODUCTS  (39 items across 9 categories)
+     SEED PRODUCTS  (المنتجات الافتراضية بأسعار تقريبية بالليرة السورية ل.س)
      Schema: id | name | nameAr | category | price | imageURL | unit | emoji | available
   ───────────────────────────────────────────────────────────── */
   const SEED_PRODUCTS = [
-    /* ── Dairy ── */
-    { id:'d1', name:'Full Fat Milk 1L',        nameAr:'حليب كامل الدسم ١ لتر',    category:'Dairy',    price:4.50,  imageURL:'', unit:'1L',     emoji:'🥛', available:true  },
-    { id:'d2', name:'Fresh Yoghurt 500g',       nameAr:'زبادي طازج ٥٠٠ جرام',     category:'Dairy',    price:6.25,  imageURL:'', unit:'500g',   emoji:'🍶', available:true  },
-    { id:'d3', name:'Cheddar Cheese 400g',      nameAr:'جبن شيدر ٤٠٠ جرام',        category:'Dairy',    price:18.75, imageURL:'', unit:'400g',   emoji:'🧀', available:true  },
-    { id:'d4', name:'Labneh 500g',              nameAr:'لبنة ٥٠٠ جرام',            category:'Dairy',    price:9.00,  imageURL:'', unit:'500g',   emoji:'🫙', available:true  },
-    { id:'d5', name:'Butter 200g',              nameAr:'زبدة ٢٠٠ جرام',            category:'Dairy',    price:11.50, imageURL:'', unit:'200g',   emoji:'🧈', available:false },
-    /* ── Meat ── */
-    { id:'m1', name:'Chicken Breast 1kg',       nameAr:'صدر دجاج ١ كيلو',          category:'Meat',      price:24.00, imageURL:'', unit:'1kg',     emoji:'🍗', available:true  },
-    { id:'m2', name:'Lamb Chops 500g',          nameAr:'ضلوع خروف ٥٠٠ جرام',      category:'Meat',      price:38.00, imageURL:'', unit:'500g',   emoji:'🥩', available:true  },
-    { id:'m3', name:'Minced Beef 500g',         nameAr:'لحم بقري مفروم ٥٠٠ جرام', category:'Meat',      price:27.50, imageURL:'', unit:'500g',   emoji:'🥩', available:true  },
-    { id:'m4', name:'Whole Chicken ~1.5kg',     nameAr:'دجاجة كاملة ~١.٥ كيلو',   category:'Meat',      price:22.00, imageURL:'', unit:'~1.5kg', emoji:'🐔', available:true  },
-    { id:'m5', name:'Salmon Fillet 300g',       nameAr:'فيليه سلمون ٣٠٠ جرام',    category:'Meat',      price:42.00, imageURL:'', unit:'300g',   emoji:'🐟', available:true  },
-    /* ── Frozen ── */
-    { id:'f1', name:'Frozen Peas 1kg',          nameAr:'بازلاء مجمدة ١ كيلو',      category:'Frozen',    price:8.50,  imageURL:'', unit:'1kg',     emoji:'❄️', available:true  },
-    { id:'f2', name:'Chicken Nuggets 400g',     nameAr:'ناجتس دجاج ٤٠٠ جرام',     category:'Frozen',    price:16.00, imageURL:'', unit:'400g',   emoji:'🍗', available:true  },
-    { id:'f3', name:'Mixed Vegetables 1kg',     nameAr:'خضار مشكلة مجمدة ١ كيلو', category:'Frozen',    price:11.25, imageURL:'', unit:'1kg',     emoji:'🥦', available:true  },
-    { id:'f4', name:'Fish Fingers 400g',        nameAr:'أصابع سمك ٤٠٠ جرام',      category:'Frozen',    price:19.00, imageURL:'', unit:'400g',   emoji:'🐟', available:true  },
-    /* ── Groceries ── */
-    { id:'g1', name:'Basmati Rice 5kg',         nameAr:'أرز بسمتي ٥ كيلو',         category:'Groceries', price:32.00, imageURL:'', unit:'5kg',     emoji:'🌾', available:true  },
-    { id:'g2', name:'Extra Virgin Olive Oil 1L',nameAr:'زيت زيتون بكر ممتاز ١ لتر',category:'Groceries', price:39.50, imageURL:'', unit:'1L',     emoji:'🫒', available:true  },
-    { id:'g3', name:'Tomato Paste 400g',        nameAr:'معجون طماطم ٤٠٠ جرام',    category:'Groceries', price:5.75,  imageURL:'', unit:'400g',   emoji:'🍅', available:true  },
-    { id:'g4', name:'Chickpeas 400g (canned)',  nameAr:'حمص معلب ٤٠٠ جرام',       category:'Groceries', price:4.50,  imageURL:'', unit:'400g',   emoji:'🥫', available:true  },
-    { id:'g5', name:'Spaghetti 500g',           nameAr:'سباغيتي ٥٠٠ جرام',        category:'Groceries', price:6.00,  imageURL:'', unit:'500g',   emoji:'🍝', available:true  },
-    { id:'g6', name:'All-Purpose Flour 1kg',    nameAr:'دقيق متعدد الأغراض ١ كيلو',category:'Groceries', price:5.25,  imageURL:'', unit:'1kg',     emoji:'🌾', available:true  },
-    { id:'g7', name:'Sugar 2kg',                nameAr:'سكر ٢ كيلو',              category:'Groceries', price:7.50,  imageURL:'', unit:'2kg',     emoji:'🍬', available:true  },
-    /* ── Cleaners ── */
-    { id:'c1', name:'Dish Soap 750ml',          nameAr:'سائل غسيل الصحون ٧٥٠ مل',category:'Cleaners',  price:8.25,  imageURL:'', unit:'750ml',  emoji:'🧴', available:true  },
-    { id:'c2', name:'Floor Cleaner 1L',         nameAr:'منظف أرضيات ١ لتر',       category:'Cleaners',  price:12.00, imageURL:'', unit:'1L',     emoji:'🧹', available:true  },
-    { id:'c3', name:'Laundry Detergent 3kg',    nameAr:'مسحوق غسيل ٣ كيلو',      category:'Cleaners',  price:28.50, imageURL:'', unit:'3kg',     emoji:'🧺', available:true  },
-    { id:'c4', name:'Multi-Surface Spray 500ml',nameAr:'بخاخ متعدد الأسطح ٥٠٠ مل',category:'Cleaners', price:9.75,  imageURL:'', unit:'500ml',  emoji:'🧽', available:true  },
-    { id:'c5', name:'Bleach 1L',                nameAr:'كلور ١ لتر',              category:'Cleaners',  price:6.50,  imageURL:'', unit:'1L',     emoji:'🫧', available:true  },
-    /* ── Beverages ── */
-    { id:'b1', name:'Mineral Water 1.5L ×6',   nameAr:'مياه معدنية ١.٥ لتر × ٦', category:'Beverages', price:10.50, imageURL:'', unit:'6-pack', emoji:'💧', available:true  },
-    { id:'b2', name:'Orange Juice 1L',          nameAr:'عصير برتقال ١ لتر',       category:'Beverages', price:9.25,  imageURL:'', unit:'1L',     emoji:'🍊', available:true  },
-    { id:'b3', name:'Green Tea 25 bags',        nameAr:'شاي أخضر ٢٥ كيس',        category:'Beverages', price:14.00, imageURL:'', unit:'25 bags',emoji:'🍵', available:true  },
-    { id:'b4', name:'Cola 330ml ×6',            nameAr:'كولا ٣٣٠ مل × ٦',        category:'Beverages', price:18.00, imageURL:'', unit:'6-pack', emoji:'🥤', available:true  },
-    /* ── Snacks ── */
-    { id:'s1', name:'Salted Chips 150g',        nameAr:'رقائق مملحة ١٥٠ جرام',   category:'Snacks',     price:5.50,  imageURL:'', unit:'150g',   emoji:'🍿', available:true  },
-    { id:'s2', name:'Mixed Nuts 200g',          nameAr:'مكسرات مشكلة ٢٠٠ جرام', category:'Snacks',     price:19.50, imageURL:'', unit:'200g',   emoji:'🥜', available:true  },
-    { id:'s3', name:'Dark Chocolate 100g',      nameAr:'شوكولاتة داكنة ١٠٠ جرام',category:'Snacks',     price:11.00, imageURL:'', unit:'100g',   emoji:'🍫', available:true  },
-    { id:'s4', name:'Crackers 200g',            nameAr:'كراكر ٢٠٠ جرام',         category:'Snacks',     price:7.25,  imageURL:'', unit:'200g',   emoji:'🫙', available:true  },
-    /* ── Bakery ── */
-    { id:'bk1',name:'White Sandwich Bread',     nameAr:'خبز التوست الأبيض',       category:'Bakery',     price:4.75,  imageURL:'', unit:'700g',   emoji:'🍞', available:true  },
-    { id:'bk2',name:'Croissants ×4',            nameAr:'كرواسون × ٤',             category:'Bakery',     price:12.00, imageURL:'', unit:'4 pcs',  emoji:'🥐', available:true  },
-    { id:'bk3',name:'Arabic Flatbread 5 pcs',   nameAr:'خبز عربي ٥ قطع',         category:'Bakery',     price:3.50,  imageURL:'', unit:'5 pcs',  emoji:'🫓', available:true  },
-    /* ── Produce ── */
-    { id:'pr1',name:'Tomatoes 1kg',             nameAr:'طماطم ١ كيلو',           category:'Produce',   price:5.50,  imageURL:'', unit:'1kg',     emoji:'🍅', available:true  },
-    { id:'pr2',name:'Bananas 1kg',              nameAr:'موز ١ كيلو',              category:'Produce',   price:4.25,  imageURL:'', unit:'1kg',     emoji:'🍌', available:true  },
-    { id:'pr3',name:'Mixed Salad Leaves 200g',  nameAr:'خليط خضار للسلطة ٢٠٠ جرام',category:'Produce', price:8.00,  imageURL:'', unit:'200g',   emoji:'🥗', available:true  },
-    { id:'pr4',name:'Cucumber ×3',              nameAr:'خيار × ٣',                category:'Produce',   price:3.75,  imageURL:'', unit:'3 pcs',  emoji:'🥒', available:true  },
+    /* ── Dairy (الأجبان والألبان) ── */
+    { id:'d1', name:'Full Fat Milk 1L',        nameAr:'حليب كامل الدسم ١ لتر',    category:'Dairy',    price:11000,  imageURL:'', unit:'1L',     emoji:'🥛', available:true  },
+    { id:'d2', name:'Fresh Yoghurt 1kg',       nameAr:'لبن رائب طازج ١ كيلو',     category:'Dairy',    price:9500,   imageURL:'', unit:'1kg',    emoji:'🍶', available:true  },
+    { id:'d3', name:'Local White Cheese 1kg',  nameAr:'جبنة بيضاء بلدية ١ كيلو',  category:'Dairy',    price:36000,  imageURL:'', unit:'1kg',    emoji:'🧀', available:true  },
+    { id:'d4', name:'Labneh البلدية 500g',       nameAr:'لبنة بلدية مصفاة ٥٠٠ غ',   category:'Dairy',    price:16000,  imageURL:'', unit:'500g',   emoji:'🫙', available:true  },
+    { id:'d5', name:'Butter 200g',              nameAr:'زبدة لورباك ٢٠٠ جرام',     category:'Dairy',    price:32000,  imageURL:'', unit:'200g',   emoji:'🧈', available:true },
+    
+    /* ── Meat (اللحوم والدواجن) ── */
+    { id:'m1', name:'Chicken Breast 1kg',       nameAr:'شرحات صدر دجاج ١ كيلو',     category:'Meat',     price:62000,  imageURL:'', unit:'1kg',     emoji:'🍗', available:true  },
+    { id:'m2', name:'Lamb Meat 1kg',           nameAr:'لحم خروف بلدي ١ كيلو',     category:'Meat',     price:185000, imageURL:'', unit:'1kg',    emoji:'🥩', available:true  },
+    { id:'m3', name:'Minced Beef 1kg',          nameAr:'لحم عجورة مفروم ١ كيلو',   category:'Meat',     price:140000, imageURL:'', unit:'1kg',    emoji:'🥩', available:true  },
+    { id:'m4', name:'Whole Chicken ~1.5kg',     nameAr:'فروج كامل منظف ~١.٥ كيلو', category:'Meat',     price:48000,  imageURL:'', unit:'~1.5kg',  emoji:'🐔', available:true  },
+    
+    /* ── Frozen (المجمدات) ── */
+    { id:'f1', name:'Frozen Peas 1kg',          nameAr:'بازلاء مجمدة ١ كيلو',      category:'Frozen',    price:18000,  imageURL:'', unit:'1kg',     emoji:'❄️', available:true  },
+    { id:'f2', name:'Chicken Nuggets 400g',     nameAr:'ناجتس دجاج ٤٠٠ جرام',     category:'Frozen',    price:34000,  imageURL:'', unit:'400g',    emoji:'🍗', available:true  },
+    { id:'f3', name:'Mixed Vegetables 1kg',     nameAr:'خضار مشكلة مجمدة ١ كيلو',  category:'Frozen',    price:16500,  imageURL:'', unit:'1kg',     emoji:'🥦', available:true  },
+    
+    /* ── Groceries (المواد الغذائية) ── */
+    { id:'g1', name:'Basmati Rice 1kg',          nameAr:'أرز بسمتي كبسة ١ كيلو',    category:'Groceries', price:24000,  imageURL:'', unit:'1kg',     emoji:'🌾', available:true  },
+    { id:'g2', name:'Sunflower Oil 1L',         nameAr:'زيت عباد الشمس ١ لتر',     category:'Groceries', price:26000,  imageURL:'', unit:'1L',      emoji:'🫗', available:true  },
+    { id:'g3', name:'Olive Oil 1L',             nameAr:'زيت زيتون بكر ممتاز ١ لتر', category:'Groceries', price:75000,  imageURL:'', unit:'1L',      emoji:'🫒', available:true  },
+    { id:'g4', name:'Tomato Paste 400g',        nameAr:'دبس طماطم علب ٤٠٠ غ',     category:'Groceries', price:11000,  imageURL:'', unit:'400g',    emoji:'🍅', available:true  },
+    { id:'g5', name:'Spaghetti 500g',           nameAr:'معكرونة سباغيتي ٥٠٠ غ',    category:'Groceries', price:8500,   imageURL:'', unit:'500g',    emoji:'🍝', available:true  },
+    { id:'g6', name:'Sugar 1kg',                nameAr:'سكر أبيض ناعم ١ كيلو',     category:'Groceries', price:14000,  imageURL:'', unit:'1kg',     emoji:'🍬', available:true  },
+    { id:'g7', name:'Turkish Coffee 250g',      nameAr:'بن قهوة تركي ٢٥٠ غ',       category:'Groceries', price:38000,  imageURL:'', unit:'250g',    emoji:'☕', available:true  },
+    
+    /* ── Cleaners (المنظفات) ── */
+    { id:'c1', name:'Dish Soap 1L',             nameAr:'سائل جلي وفير ١ لتر',      category:'Cleaners',  price:14000,  imageURL:'', unit:'1L',      emoji:'🧴', available:true  },
+    { id:'c2', name:'Floor Cleaner 1L',         nameAr:'منظف أرضيات وعطور ١ لتر',  category:'Cleaners',  price:12500,  imageURL:'', unit:'1L',      emoji:'🧹', available:true  },
+    { id:'c3', name:'Laundry Detergent 3kg',    nameAr:'مسحوق غسيل نورا ٣ كيلو',   category:'Cleaners',  price:58000,  imageURL:'', unit:'3kg',     emoji:'🧺', available:true  },
+    { id:'c4', name:'Bleach 1L',                nameAr:'كلور تبييض سائل ١ لتر',     category:'Cleaners',  price:7000,   imageURL:'', unit:'1L',      emoji:'🫧', available:true  },
+    
+    /* ── Beverages (المشروبات) ── */
+    { id:'b1', name:'Mineral Water 1.5L',       nameAr:'باقة مياه معدنية بقين ٦ قطع',category:'Beverages', price:19500,  imageURL:'', unit:'6-pack',  emoji:'💧', available:true  },
+    { id:'b2', name:'Mate Kharta 250g',         nameAr:'متة الخارطة الخضراء ٢٥٠ غ', category:'Beverages', price:24000,  imageURL:'', unit:'250g',    emoji:'🧉', available:true  },
+    { id:'b3', name:'Black Tea 100 bags',       nameAr:'شاي توليب ظرف ١٠٠ لبتون',  category:'Beverages', price:32000,  imageURL:'', unit:'100 bags',emoji:'🍵', available:true  },
+    
+    /* ── Snacks (التسالي) ── */
+    { id:'s1', name:'Potato Chips Family',      nameAr:'شيبس بطاطا ظرف عائلي',     category:'Snacks',    price:6500,   imageURL:'', unit:'1 pcs',   emoji:'🍿', available:true  },
+    { id:'s2', name:'Mixed Nuts 500g',          nameAr:'مكسرات مشكلة فواشات نصف كيلو',category:'Snacks',  price:45000,  imageURL:'', unit:'500g',    emoji:'🥜', available:true  },
+    { id:'s3', name:'Biscuit Chocolate',        nameAr:'بسكويت مغطس بالشوكولاتة',  category:'Snacks',    price:3500,   imageURL:'', unit:'1 pcs',   emoji:'🍫', available:true  },
+    
+    /* ── Bakery (المخبوزات) ── */
+    { id:'bk1',name:'Toast Bread',              nameAr:'خبز توست طازج قالب',       category:'Bakery',    price:9000,   imageURL:'', unit:'700g',    emoji:'🍞', available:true  },
+    { id:'bk2',name:'Croissants ×4',            nameAr:'كرواسون شوكولاتة ٤ قطع',   category:'Bakery',    price:14000,  imageURL:'', unit:'4 pcs',   emoji:'🥐', available:true  },
+    
+    /* ── Produce (الخضار والفواكه) ── */
+    { id:'pr1',name:'Tomatoes 1kg',             nameAr:'طماطم (بندورة) بلدي ١ كيلو', category:'Produce',   price:6500,   imageURL:'', unit:'1kg',     emoji:'🍅', available:true  },
+    { id:'pr2',name:'Bananas 1kg',              nameAr:'موز صومالي طازج ١ كيلو',    category:'Produce',   price:22000,  imageURL:'', unit:'1kg',     emoji:'🍌', available:true  },
+    { id:'pr3',name:'Cucumber 1kg',             nameAr:'خيار بلدي طازج ١ كيلو',     category:'Produce',   price:5000,   imageURL:'', unit:'1kg',     emoji:'🥒', available:true  },
+    { id:'pr4',name:'Potatoes 1kg',             nameAr:'بطاطا مخصصة للقلي ١ كيلو',  category:'Produce',   price:7500,   imageURL:'', unit:'1kg',     emoji:'🥔', available:true  }
   ];
 
   /* ─────────────────────────────────────────────────────────────
@@ -151,8 +155,6 @@ const DB = (() => {
 
   /* ─────────────────────────────────────────────────────────────
      PRODUCTS
-     Public methods: read-only, available=true enforced
-     Admin methods: prefixed with _, require auth
   ───────────────────────────────────────────────────────────── */
   const products = {
     /* ── PUBLIC (customer-safe) ── */
@@ -192,7 +194,7 @@ const DB = (() => {
           p.category.toLowerCase().includes(q)
         )
       );
-      return matches.length ? { 'Search Results': matches } : {};
+      return matches.length ? { 'نتائج البحث': matches } : {};
     },
 
     getById(id) {
@@ -223,7 +225,7 @@ const DB = (() => {
       const list = read(K.PRODUCTS) || [];
       const idx  = list.findIndex(p => p.id === id);
       if (idx < 0) return false;
-      list[idx].price = parseFloat(parseFloat(price).toFixed(2));
+      list[idx].price = Math.round(parseFloat(price));
       return write(K.PRODUCTS, list);
     },
 
@@ -235,7 +237,7 @@ const DB = (() => {
       const list = read(K.PRODUCTS) || [];
       const product = {
         id: uid(), name, nameAr: nameAr || '', category,
-        price: parseFloat(parseFloat(price).toFixed(2)),
+        price: Math.round(parseFloat(price)),
         imageURL: imageURL || '', unit: unit || '',
         emoji: emoji || '🛒', available: true,
         createdAt: new Date().toISOString(),
@@ -272,7 +274,6 @@ const DB = (() => {
 
     /**
      * Create an order from a cart snapshot.
-     * Validates input, applies promo discount, saves.
      */
     create({ customerName, phone, address, note, items, promoCode }) {
       if (!customerName || !phone || !items.length) return null;
@@ -283,11 +284,11 @@ const DB = (() => {
       let   usedCode    = '';
 
       if (promoCode && cfg.promoCode && promoCode.toUpperCase() === cfg.promoCode.toUpperCase()) {
-        discountAmt = parseFloat((subtotal * cfg.discountPct / 100).toFixed(2));
+        discountAmt = Math.round(subtotal * cfg.discountPct / 100);
         usedCode    = cfg.promoCode;
       }
 
-      const total = parseFloat((subtotal - discountAmt).toFixed(2));
+      const total = Math.round(subtotal - discountAmt);
       const now   = new Date().toISOString();
 
       const order = {
@@ -296,8 +297,8 @@ const DB = (() => {
         phone:        phone.trim(),
         address:      (address || '').trim(),
         note:         (note    || '').trim(),
-        items,                     // [{id, name, price, qty, unit, emoji}]
-        subtotal:     parseFloat(subtotal.toFixed(2)),
+        items,                     // [{id, name, nameAr, price, qty, unit, emoji}]
+        subtotal:     Math.round(subtotal),
         discountAmt,
         discountCode: usedCode,
         total,
@@ -324,7 +325,7 @@ const DB = (() => {
   };
 
   /* ─────────────────────────────────────────────────────────────
-     CART  (localStorage persistent)
+     CART
   ───────────────────────────────────────────────────────────── */
   const cart = {
     _get()          { return read(K.CART) || []; },
@@ -338,10 +339,6 @@ const DB = (() => {
       return this._get().find(i => i.id === productId) || null;
     },
 
-    /**
-     * Add product to cart (or increment qty).
-     * Returns new qty for this product.
-     */
     add(product) {
       const items = this._get();
       const idx   = items.findIndex(i => i.id === product.id);
@@ -349,13 +346,14 @@ const DB = (() => {
         items[idx].qty += 1;
       } else {
         items.push({
-          id:    product.id,
-          name:  product.name,
-          price: product.price,
-          unit:  product.unit  || '',
-          emoji: product.emoji || '🛒',
+          id:       product.id,
+          name:     product.name,
+          nameAr:   product.nameAr || product.name,
+          price:    product.price,
+          unit:     product.unit  || '',
+          emoji:    product.emoji || '🛒',
           imageURL: product.imageURL || '',
-          qty:   1,
+          qty:      1,
         });
       }
       this._set(items);
@@ -395,39 +393,40 @@ const DB = (() => {
   };
 
   /* ─────────────────────────────────────────────────────────────
-     WHATSAPP MESSAGE BUILDER
+     WHATSAPP MESSAGE BUILDER (مكتوبة بالعربية المتكاملة لخدمة زبائن الماركت في الشام)
   ───────────────────────────────────────────────────────────── */
   function buildWhatsAppMessage({ customerName, phone, address, note, items, subtotal, discountAmt, discountCode, total, orderId, timestamp }) {
-    const line  = '─'.repeat(28);
+    const line  = '═'.repeat(25);
     const parts = [
-      `🛒 *New Order — Dubai Supermarket*`,
-      `دبي سوبرماركت`,
+      `🛒 *طلب جديد — دبي سوبرماركت*`,
+      `📍 دمشق - أشرفية صحنايا (مقابل حديقة سندباد)`,
       line,
-      `📋 *Order ID:* ${orderId}`,
-      `👤 *Name:* ${customerName}`,
-      `📞 *Phone:* ${phone}`,
+      `📋 *رقم الطلب:* ${orderId}`,
+      `👤 *الاسم:* ${customerName}`,
+      `📞 *رقم التواصل:* ${phone}`,
     ];
-    if (address) parts.push(`📍 *Address:* ${address}`);
-    parts.push(`🕐 *Time:* ${timestamp}`);
+    if (address) parts.push(`📍 *العنوان:* ${address}`);
+    parts.push(`🕐 *التاريخ:* ${timestamp}`);
     parts.push(line);
-    parts.push(`\n*ITEMS:*`);
+    parts.push(`📦 *المنتجات المطلوبة:*`);
 
     items.forEach((item, i) => {
-      const lineTotal = (item.price * item.qty).toFixed(2);
+      const lineTotal = (item.price * item.qty).toLocaleString('ar-SY');
+      const itemTitle = item.nameAr || item.name;
       parts.push(
-        `${i + 1}. ${item.emoji} ${item.name}`,
-        `    Qty: ${item.qty} × AED ${item.price.toFixed(2)} = *AED ${lineTotal}*`
+        `${i + 1}. ${item.emoji} *${itemTitle}*`,
+        `   الكمية: ${item.qty} × ${item.price.toLocaleString('ar-SY')} = *${lineTotal} ل.س*`
       );
     });
 
     parts.push(`\n${line}`);
-    parts.push(`Subtotal:  AED ${subtotal.toFixed(2)}`);
+    parts.push(`الفاتورة الجزئية: ${subtotal.toLocaleString('ar-SY')} ل.س`);
     if (discountAmt > 0) {
-      parts.push(`Discount (${discountCode}): −AED ${discountAmt.toFixed(2)}`);
+      parts.push(`قيمة الخصم (${discountCode}): −${discountAmt.toLocaleString('ar-SY')} ل.س`);
     }
-    parts.push(`*TOTAL:    AED ${total.toFixed(2)}*`);
-    if (note) parts.push(`\n📝 *Note:* ${note}`);
-    parts.push(`\n_Sent via Dubai Supermarket App_`);
+    parts.push(`💰 *الإجمالي النهائي: ${total.toLocaleString('ar-SY')} ل.س*`);
+    if (note) parts.push(`\n📝 *ملاحظات الزبون:* ${note}`);
+    parts.push(`\n_أُرسل عبر تطبيق دبي سوبرماركت الذكي_`);
 
     return parts.join('\n');
   }
