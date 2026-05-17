@@ -809,4 +809,3 @@ select.form-input { cursor: pointer; }
 
 /* ── SAFE AREA HELPERS ───────────────────────────────────────── */
 .main-view { padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 24px); }
-
