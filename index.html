@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="app.css?v=1.2" />
+  <link rel="stylesheet" href="app.css?v=1.4" />
 </head>
 <body>
 <div id="app" class="app">
@@ -254,7 +254,7 @@
 <script src="cart.js"></script>
 <script src="app.js"></script>
 <script>
-  // حل أمان إضافي لإجبار الواجهة على العمل فور اكتمال تحميل الصفحة بالكامل
+  // كود أمان احتياطي لتشغيل الواجهة فوراً
   window.addEventListener('DOMContentLoaded', () => {
     if (typeof UI !== 'undefined' && typeof UI.init === 'function') {
       UI.init();
