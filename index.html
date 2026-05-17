@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a3a2a" />
+  <meta name="description" content="سوبرماركت أشرفية صحنايا — دمشق، سوريا" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="أشرفية صحنايا" />
+  <link rel="manifest" href="manifest.json" />
+  <title>سوبرماركت أشرفية صحنايا | دمشق</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+<div id="app" class="app">
+
+  <!-- SPLASH -->
+  <div id="splash" class="splash">
+    <div class="splash-inner">
+      <div class="splash-logo-wrap">
+        <span class="splash-cart">🛒</span>
+        <h1 class="splash-name">Dubai Supermarket</h1>
+        <p class="splash-ar">دبي سوبرماركت</p>
+      </div>
+      <div class="splash-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header id="header" class="header">
+    <div class="header-row">
+      <div class="brand">
+        <span class="brand-icon">🛒</span>
+        <div>
+          <p class="brand-en">Ashrafi Sahnaya Market</p>
+          <p class="brand-ar">سوبرماركت أشرفية صحنايا — دمشق</p>
+        </div>
+      </div>
+      <div class="header-btns">
+        <button id="btn-admin" class="icon-btn" aria-label="Admin panel">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+        <button id="btn-cart" class="icon-btn cart-icon-btn" aria-label="Open cart">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span id="cart-badge" class="cart-badge hidden">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="search-row">
+      <div class="search-box">
+        <svg class="search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="search-input" type="search" class="search-input" placeholder="ابحث عن منتج…" autocomplete="off" spellcheck="false" />
+        <button id="search-clear" class="search-clear hidden" aria-label="Clear">✕</button>
+      </div>
+    </div>
+
+    <div class="chips-row" id="chips" role="tablist">
+      <button class="chip active" data-cat="all" role="tab">All</button>
+      <button class="chip" data-cat="Dairy" role="tab">🥛 Dairy</button>
+      <button class="chip" data-cat="Meat" role="tab">🥩 Meat</button>
+      <button class="chip" data-cat="Frozen" role="tab">❄️ Frozen</button>
+      <button class="chip" data-cat="Groceries" role="tab">🌾 Groceries</button>
+      <button class="chip" data-cat="Cleaners" role="tab">🧹 Cleaners</button>
+      <button class="chip" data-cat="Beverages" role="tab">🥤 Beverages</button>
+      <button class="chip" data-cat="Snacks" role="tab">🍿 Snacks</button>
+      <button class="chip" data-cat="Bakery" role="tab">🍞 Bakery</button>
+      <button class="chip" data-cat="Produce" role="tab">🥦 Produce</button>
+    </div>
+  </header>
+
+  <!-- MAIN SHOP VIEW -->
+  <main id="shop-view" class="main-view">
+    <div id="promo-banner" class="promo-banner">
+      <div class="promo-text">
+        <span class="promo-tag">🔥 عروض</span>
+        <span>توصيل مجاني عند الطلب فوق ٥٠،٠٠٠ ل.س</span>
+      </div>
+      <button id="promo-close" class="promo-close-btn" aria-label="إغلاق">✕</button>
+    </div>
+    <div id="product-feed" class="product-feed"></div>
+    <div id="empty-state" class="empty-state hidden">
+      <p class="empty-emoji">🔍</p>
+      <p class="empty-title">لا توجد منتجات</p>
+      <p class="empty-sub">جرب كلمة مختلفة أو فئة أخرى</p>
+      <button id="empty-reset" class="btn-outline mt-16">عرض جميع المنتجات</button>
+    </div>
+  </main>
+
+  <!-- ORDERS VIEW -->
+  <main id="orders-view" class="main-view hidden" aria-hidden="true">
+    <div class="page-header">
+      <h2 class="page-title">طلباتي <span class="page-ar">My Orders</span></h2>
+    </div>
+    <div id="orders-list" class="orders-list"></div>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-view="shop">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>المتجر</span>
+    </button>
+    <button class="nav-item" data-view="orders">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span>طلباتي</span>
+    </button>
+    <button class="nav-item" id="nav-cart-btn" data-view="cart">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span>السلة</span>
+    </button>
+  </nav>
+</div>
+
+<!-- CART DRAWER -->
+<div id="overlay" class="overlay hidden"></div>
+<aside id="cart-drawer" class="drawer hidden" role="dialog" aria-modal="true" aria-label="Shopping cart">
+  <div class="drawer-head">
+    <h2 class="drawer-title">السلة <span class="drawer-ar">Cart</span></h2>
+    <button id="cart-close" class="icon-btn" aria-label="Close cart">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div id="cart-items" class="drawer-body"></div>
+  <div id="cart-footer" class="drawer-foot"></div>
+</aside>
+
+<!-- CHECKOUT MODAL -->
+<div id="checkout-overlay" class="overlay hidden"></div>
+<div id="checkout-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Checkout">
+  <div class="modal-head">
+    <h2>Place Order <span class="modal-ar">تأكيد الطلب</span></h2>
+    <button id="checkout-close" class="icon-btn" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label>Full Name <span class="req">*</span></label>
+      <input id="cust-name" type="text" class="form-input" placeholder="أحمد الخطيب" autocomplete="name" />
+    </div>
+    <div class="form-group">
+      <label>Phone / WhatsApp <span class="req">*</span></label>
+      <input id="cust-phone" type="tel" class="form-input" placeholder="+963 9X XXX XXXX" autocomplete="tel" />
+    </div>
+    <div class="form-group">
+      <label>Delivery Address</label>
+      <textarea id="cust-address" class="form-input" rows="2" placeholder="حي، شارع، مبنى – دمشق"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Note to store</label>
+      <textarea id="order-note" class="form-input" rows="2" placeholder="ملاحظات خاصة…"></textarea>
+    </div>
+    <div id="checkout-summary" class="checkout-summary"></div>
+    <div class="promo-row">
+      <input id="promo-code-input" type="text" class="form-input form-input--sm" placeholder="كود الخصم (اختياري)" />
+      <button id="apply-promo" class="btn-sm btn-outline">Apply</button>
+    </div>
+    <p id="promo-msg" class="promo-msg hidden"></p>
+    <div class="modal-actions">
+      <button id="send-whatsapp" class="btn-whatsapp">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.967-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.134.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.981.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+        Send via WhatsApp
+      </button>
+      <button id="copy-order" class="btn-outline">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Order Text
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN DRAWER -->
+<div id="admin-overlay" class="overlay hidden"></div>
+<aside id="admin-drawer" class="drawer admin-drawer hidden" role="dialog" aria-modal="true" aria-label="Admin panel">
+  <div class="drawer-head">
+    <h2 class="drawer-title">Admin <span class="drawer-ar">التحكم</span></h2>
+    <button id="admin-close" class="icon-btn" aria-label="Close admin">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Admin login gate -->
+  <div id="admin-gate" class="admin-gate drawer-body">
+    <div class="gate-wrap">
+      <span class="gate-icon">🔐</span>
+      <p class="gate-title">Admin Access</p>
+      <p class="gate-hint">كلمة المرور الافتراضية: <code>admin123</code></p>
+      <input id="admin-password" type="password" class="form-input" placeholder="Password" autocomplete="current-password" />
+      <button id="admin-login-btn" class="btn-primary mt-16">Login</button>
+    </div>
+  </div>
+
+  <!-- Admin panel content (hidden until login) -->
+  <div id="admin-panel" class="hidden" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="products">Products</button>
+      <button class="admin-tab" data-tab="orders">Orders</button>
+      <button class="admin-tab" data-tab="add">+ Add</button>
+      <button class="admin-tab" data-tab="config">Config</button>
+    </div>
+
+    <div class="drawer-body admin-body" style="flex:1;overflow-y:auto">
+
+      <!-- Tab: Products -->
+      <div id="tab-products" class="tab-pane">
+        <input id="admin-filter" type="search" class="form-input form-input--sm mb-12" placeholder="Filter products…" />
+        <div id="admin-product-list"></div>
+      </div>
+
+      <!-- Tab: Orders -->
+      <div id="tab-orders" class="tab-pane hidden">
+        <div id="admin-orders-list"></div>
+      </div>
+
+      <!-- Tab: Add Product -->
+      <div id="tab-add" class="tab-pane hidden">
+        <div class="form-group">
+          <label>Name (EN) <span class="req">*</span></label>
+          <input id="new-name" type="text" class="form-input" placeholder="Full Fat Milk 1L" />
+        </div>
+        <div class="form-group">
+          <label>Arabic Name</label>
+          <input id="new-name-ar" type="text" class="form-input" placeholder="حليب كامل الدسم ١ لتر" />
+        </div>
+        <div class="form-group">
+          <label>Category <span class="req">*</span></label>
+          <select id="new-cat" class="form-input">
+            <option value="">Select…</option>
+            <option>Dairy</option><option>Meat</option><option>Frozen</option>
+            <option>Groceries</option><option>Cleaners</option><option>Beverages</option>
+            <option>Snacks</option><option>Bakery</option><option>Produce</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>Price AED <span class="req">*</span></label>
+            <input id="new-price" type="number" class="form-input" placeholder="0.00" step="0.01" min="0" />
+          </div>
+          <div class="form-group flex-1">
+            <label>Unit</label>
+            <input id="new-unit" type="text" class="form-input" placeholder="kg / L / pcs" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Image URL</label>
+          <input id="new-image" type="url" class="form-input" placeholder="https://…" />
+        </div>
+        <div class="form-group">
+          <label>Emoji</label>
+          <input id="new-emoji" type="text" class="form-input" placeholder="🧀" maxlength="4" />
+        </div>
+        <button id="add-product-btn" class="btn-primary">Add Product</button>
+        <p id="add-product-msg" class="form-msg hidden"></p>
+      </div>
+
+      <!-- Tab: Config -->
+      <div id="tab-config" class="tab-pane hidden">
+        <div class="form-group">
+          <label>Store WhatsApp Number <span class="req">*</span></label>
+          <input id="cfg-phone" type="tel" class="form-input" placeholder="963XXXXXXXXX" />
+          <small class="form-hint">Country code without +, e.g. 971501234567</small>
+        </div>
+        <div class="form-group">
+          <label>Promo Code</label>
+          <input id="cfg-promo" type="text" class="form-input" placeholder="SYRIA10" />
+        </div>
+        <div class="form-group">
+          <label>Discount % (0 = disabled)</label>
+          <input id="cfg-discount" type="number" class="form-input" placeholder="10" min="0" max="100" />
+        </div>
+        <div class="form-group">
+          <label>Change Admin Password</label>
+          <input id="cfg-password" type="password" class="form-input" placeholder="New password" />
+        </div>
+        <button id="save-config-btn" class="btn-primary">Save Config</button>
+        <p id="cfg-msg" class="form-msg hidden"></p>
+        <hr class="divider" />
+        <div class="danger-zone">
+          <p class="danger-label">Danger Zone</p>
+          <button id="clear-all-btn" class="btn-danger">⚠️ Reset All App Data</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-foot">
+      <button id="admin-logout-btn" class="btn-outline btn-sm">Logout</button>
+    </div>
+  </div>
+</aside>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden" role="alert" aria-live="assertive"></div>
+
+<script src="js/db.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
