@@ -1,21 +1,20 @@
 /**
- * app.js - Main Application Controller
- * Orchestrates DB data, Cart operations, and UI rendering.
+ * app.js - Main Application Controller (Compatible with Dubai Supermarket Data Layer)
  */
 
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Initialize Database Core & Data seeding
-  if (typeof DB !== 'undefined') {
+  if (typeof DB !== 'undefined' && typeof DB.init === 'function') {
     DB.init();
   } else {
-    console.error("Database core (db.js) is missing!");
+    console.error("Database core (db.js) is missing or not structured correctly!");
     return;
   }
 
   // 2. Initial DOM Render
-  if (typeof UI !== 'undefined') {
+  if (typeof UI !== 'undefined' && typeof UI.init === 'function') {
     UI.init();
   } else {
     console.error("UI rendering engine (ui.js) is missing!");
@@ -39,8 +38,8 @@ function setupGlobalEventListeners() {
       const product = DB.products.getById(productId);
       if (product) {
         DB.cart.add(product);
-        UI.refreshCart();
-        UI.updateProductCardQty(productId);
+        if (typeof UI.refreshCart === 'function') UI.refreshCart();
+        if (typeof UI.updateProductCardQty === 'function') UI.updateProductCardQty(productId);
       }
     }
 
@@ -49,8 +48,8 @@ function setupGlobalEventListeners() {
       const btn = target.classList.contains('qty-inc') ? target : target.closest('.qty-inc');
       const productId = btn.getAttribute('data-id');
       DB.cart.increment(productId);
-      UI.refreshCart();
-      UI.updateProductCardQty(productId);
+      if (typeof UI.refreshCart === 'function') UI.refreshCart();
+      if (typeof UI.updateProductCardQty === 'function') UI.updateProductCardQty(productId);
     }
 
     // Decrement quantity
@@ -58,9 +57,8 @@ function setupGlobalEventListeners() {
       const btn = target.classList.contains('qty-dec') ? target : target.closest('.qty-dec');
       const productId = btn.getAttribute('data-id');
       DB.cart.decrement(productId);
-      UI.refreshCart();
-      UI.updateProductCardQty(productId);
+      if (typeof UI.refreshCart === 'function') UI.refreshCart();
+      if (typeof UI.updateProductCardQty === 'function') UI.updateProductCardQty(productId);
     }
   });
 }
-
