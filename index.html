@@ -3,74 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مطعم Friends</title>
+    <title>دبي ماركت</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 pb-24">
+<body class="bg-gray-100 pb-24">
 
-    <header class="bg-red-600 text-white p-6 text-center shadow-lg">
-        <h1 class="text-2xl font-bold">مطعم Friends</h1>
+    <header class="bg-blue-700 text-white p-6 text-center shadow-lg">
+        <h1 class="text-2xl font-bold">🛒 دبي ماركت</h1>
     </header>
 
-    <div class="sticky top-0 z-20 bg-gray-50 p-4 shadow-sm">
-        <input type="text" id="searchInput" placeholder="🔍 بحث عن وجبة..." class="w-full p-3 rounded-lg border mb-3">
-        <div id="categoryTabs" class="flex gap-2 overflow-x-auto pb-2">
-            </div>
+    <div class="sticky top-0 z-20 bg-gray-100 p-4 shadow-sm">
+        <input type="text" id="searchInput" oninput="renderApp()" placeholder="🔍 ابحث عن منتج..." class="w-full p-3 rounded-xl border">
+        <div id="categoryTabs" class="flex gap-2 overflow-x-auto pt-3 pb-1"></div>
     </div>
 
     <div id="productGrid" class="p-4 grid grid-cols-1 gap-4"></div>
 
     <div class="fixed bottom-0 w-full p-4 bg-white border-t shadow-lg">
-        <button onclick="showCart()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold">
-            🛒 عرض السلة وإتمام الطلب
-        </button>
+        <button onclick="sendOrder()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold">🚀 إرسال الطلب عبر واتساب</button>
     </div>
 
     <script>
-        // هنا تضع رابط الـ CSV الخاص بك
-        const CSV_URL = 'YOUR_GOOGLE_SHEET_CSV_URL'; 
-        let products = [];
-        let cart = {};
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTtNzL5RpYNOFwQsy63YyqYLK4ExXEKO8nfmfKlLdRMoIFy1sPIZT8dPFcKkQK6f2P9jYPuFDQOxW3C/pub?gid=0&single=true&output=csv';
+        let products = [], cart = {}, currentCat = 'الكل';
 
-        async function fetchData() {
-            const res = await fetch(CSV_URL);
-            const data = await res.text();
-            // معالجة البيانات من الشيت
-            products = data.split('\n').slice(1).map(row => {
-                const [name, price, cat, desc, img] = row.split(',');
-                return { name, price, cat, desc, img };
-            }).filter(p => p.name);
-            renderTabs();
-            renderProducts();
+        async function init() {
+            try {
+                const res = await fetch(CSV_URL);
+                const data = await res.text();
+                // معالجة البيانات: الاسم، السعر، القسم، الصورة
+                products = data.split('\n').slice(1).map(row => {
+                    const [name, price, cat, img] = row.split(',');
+                    return { name, price: price || 0, cat: cat || 'أخرى', img: img || '' };
+                }).filter(p => p.name);
+                renderApp();
+            } catch (e) { document.body.innerHTML = "<h1 class='text-center mt-10'>خطأ في تحميل البيانات!</h1>"; }
         }
 
-        function renderTabs() {
-            const cats = ['الكل', ...new Set(products.map(p => p.cat))];
-            document.getElementById('categoryTabs').innerHTML = cats.map(c => 
-                `<button onclick="filterBy('${c}')" class="px-4 py-2 bg-white border rounded-full whitespace-nowrap">${c}</button>`
-            ).join('');
-        }
-
-        function renderProducts(filter = 'الكل') {
+        function renderApp() {
             const search = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = products.filter(p => 
-                (filter === 'الكل' || p.cat === filter) && 
-                p.name.toLowerCase().includes(search)
-            );
+            const cats = ['الكل', ...new Set(products.map(p => p.cat))];
+            
+            document.getElementById('categoryTabs').innerHTML = cats.map(c => 
+                `<button onclick="currentCat='${c}'; renderApp()" class="px-4 py-2 ${currentCat==c?'bg-blue-600 text-white':'bg-white'} border rounded-full">${c}</button>`
+            ).join('');
+
+            const filtered = products.filter(p => (currentCat=='الكل' || p.cat==currentCat) && p.name.toLowerCase().includes(search));
+            
             document.getElementById('productGrid').innerHTML = filtered.map(p => `
                 <div class="bg-white p-4 rounded-xl shadow flex items-center gap-4">
-                    <img src="${p.img}" class="w-20 h-20 rounded-lg object-cover">
+                    <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'" class="w-16 h-16 rounded-lg object-cover bg-gray-200">
                     <div class="flex-grow">
                         <h3 class="font-bold">${p.name}</h3>
-                        <p class="text-red-600">${p.price} ل.س</p>
+                        <p class="text-blue-600 font-bold">${p.price} ل.س</p>
                     </div>
-                    <button onclick="addToCart('${p.name}')" class="bg-red-100 text-red-600 px-4 py-2 rounded-lg">+</button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="updateQty('${p.name}', -1)" class="w-8 h-8 rounded-full bg-gray-200">-</button>
+                        <span id="qty-${p.name}" class="font-bold w-6 text-center">0</span>
+                        <button onclick="updateQty('${p.name}', 1)" class="w-8 h-8 rounded-full bg-blue-500 text-white">+</button>
+                    </div>
                 </div>
             `).join('');
         }
 
-        // إضافة دوال البحث والفلترة والسلة هنا...
-        // (ملاحظة: هذا الكود هيكلي، يمكنك إضافة منطق السلة ببساطة)
+        function updateQty(name, change) {
+            cart[name] = Math.max(0, (cart[name] || 0) + change);
+            document.getElementById(`qty-${name}`).innerText = cart[name];
+        }
+
+        function sendOrder() {
+            let msg = `*طلب جديد - دبي ماركت*\n\n`;
+            let hasItems = false;
+            products.forEach(p => { if(cart[p.name]>0) { msg += `• ${p.name} (x${cart[p.name]})\n`; hasItems = true; }});
+            if(!hasItems) return alert("السلة فارغة!");
+            window.open(`https://wa.me/963955929797?text=${encodeURIComponent(msg)}`);
+        }
+        init();
     </script>
 </body>
 </html>
