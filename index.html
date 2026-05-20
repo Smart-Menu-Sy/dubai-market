@@ -28,13 +28,25 @@
         let products = [], cart = {};
 
         async function init() {
-            const res = await fetch(CSV_URL + "&t=" + Date.now());
-            const data = await res.text();
-            products = data.split('\n').slice(1).map(row => {
-                const [name, price, cat, img] = row.split(',');
-                return { name, price: price || 0, img: img || '' };
-            }).filter(p => p.name);
-            render();
+            try {
+                const res = await fetch(CSV_URL + "&t=" + Date.now());
+                const data = await res.text();
+                // ترتيب الأعمدة: [0]=الاسم، [1]=غير مستخدم، [2]=القسم، [3]=السعر، [4]=الصورة
+                products = data.split('\n').slice(1).map(row => {
+                    const cols = row.split(',');
+                    return { name: cols[0], price: cols[3] || 0, cat: cols[2], img: cols[4] || '' };
+                }).filter(p => p.name);
+                
+                // إضافة منتجات تجريبية لو الشيت فارغ
+                if(products.length === 0) {
+                    products = [
+                        {name: 'سنيكرز', price: 150, cat: 'حلويات', img: ''},
+                        {name: 'حليب 1 لتر', price: 400, cat: 'ألبان', img: ''},
+                        {name: 'كولا 7 اب', price: 250, cat: 'مشروبات', img: ''}
+                    ];
+                }
+                render();
+            } catch (e) { alert("خطأ في تحميل البيانات"); }
         }
 
         function render() {
@@ -45,7 +57,8 @@
                     <img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'" class="w-16 h-16 rounded-lg object-cover">
                     <div class="flex-grow">
                         <h3 class="font-bold text-sm">${p.name}</h3>
-                        <input type="text" id="note-${p.name}" placeholder="ملاحظة..." class="text-[10px] w-20 border rounded p-1">
+                        <p class="text-blue-600 font-bold text-xs">${p.price} ل.س</p>
+                        <input type="text" id="note-${p.name}" placeholder="ملاحظة..." class="text-[10px] w-full border rounded p-1 mt-1">
                     </div>
                     <div class="flex items-center gap-2">
                         <button onclick="update('${p.name}', -1)" class="w-8 h-8 bg-gray-200 rounded-full">-</button>
@@ -57,7 +70,9 @@
         }
 
         function update(name, change) {
-            cart[name] = { qty: Math.max(0, (cart[name]?.qty || 0) + change), note: document.getElementById('note-'+name).value };
+            if(!cart[name]) cart[name] = {qty: 0, note: ''};
+            cart[name].qty = Math.max(0, cart[name].qty + change);
+            cart[name].note = document.getElementById('note-'+name).value;
             document.getElementById(`qty-${name}`).innerText = cart[name].qty;
             showCart();
         }
@@ -67,7 +82,7 @@
             let total = 0;
             products.forEach(p => {
                 if(cart[p.name]?.qty > 0) {
-                    html += `<div class="text-[12px] flex justify-between"><span>${p.name} x${cart[p.name].qty}</span><span>${p.note}</span></div>`;
+                    html += `<div class="text-[12px] flex justify-between"><span>${p.name} (x${cart[p.name].qty})</span><span>${cart[p.name].note}</span></div>`;
                 }
             });
             document.getElementById('cartSummary').innerHTML = html;
