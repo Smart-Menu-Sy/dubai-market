@@ -6,7 +6,7 @@
     <title>دبي ماركت</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 pb-24">
+<body class="bg-gray-100 pb-28">
 
     <header class="bg-blue-700 text-white p-6 text-center shadow-lg">
         <h1 class="text-2xl font-bold">🛒 دبي ماركت</h1>
@@ -20,7 +20,9 @@
     <div id="productGrid" class="p-4 grid grid-cols-1 gap-4"></div>
 
     <div class="fixed bottom-0 w-full p-4 bg-white border-t shadow-lg">
-        <button onclick="sendOrder()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold">🚀 إرسال الطلب عبر واتساب</button>
+        <input type="text" id="cName" placeholder="👤 اسمك" class="w-full p-2 mb-1 border rounded-lg text-sm">
+        <input type="text" id="cAddress" placeholder="📍 عنوانك" class="w-full p-2 mb-2 border rounded-lg text-sm">
+        <button onclick="sendOrder()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-lg">🚀 إرسال الطلب عبر واتساب</button>
     </div>
 
     <script>
@@ -29,15 +31,14 @@
 
         async function init() {
             try {
-                const res = await fetch(CSV_URL);
+                const res = await fetch(CSV_URL + "?t=" + new Date().getTime());
                 const data = await res.text();
-                // معالجة البيانات: الاسم، السعر، القسم، الصورة
                 products = data.split('\n').slice(1).map(row => {
                     const [name, price, cat, img] = row.split(',');
                     return { name, price: price || 0, cat: cat || 'أخرى', img: img || '' };
                 }).filter(p => p.name);
                 renderApp();
-            } catch (e) { document.body.innerHTML = "<h1 class='text-center mt-10'>خطأ في تحميل البيانات!</h1>"; }
+            } catch (e) { alert("حدث خطأ في تحميل المنتجات"); }
         }
 
         function renderApp() {
@@ -45,7 +46,7 @@
             const cats = ['الكل', ...new Set(products.map(p => p.cat))];
             
             document.getElementById('categoryTabs').innerHTML = cats.map(c => 
-                `<button onclick="currentCat='${c}'; renderApp()" class="px-4 py-2 ${currentCat==c?'bg-blue-600 text-white':'bg-white'} border rounded-full">${c}</button>`
+                `<button onclick="currentCat='${c}'; renderApp()" class="px-4 py-2 ${currentCat==c?'bg-blue-600 text-white':'bg-white'} border rounded-full whitespace-nowrap">${c}</button>`
             ).join('');
 
             const filtered = products.filter(p => (currentCat=='الكل' || p.cat==currentCat) && p.name.toLowerCase().includes(search));
@@ -64,6 +65,11 @@
                     </div>
                 </div>
             `).join('');
+            
+            // تحديث الأرقام الحالية في السلة
+            Object.keys(cart).forEach(name => {
+                if(document.getElementById(`qty-${name}`)) document.getElementById(`qty-${name}`).innerText = cart[name];
+            });
         }
 
         function updateQty(name, change) {
@@ -72,11 +78,16 @@
         }
 
         function sendOrder() {
-            let msg = `*طلب جديد - دبي ماركت*\n\n`;
+            const name = document.getElementById('cName').value;
+            const address = document.getElementById('cAddress').value;
+            if(!name || !address) return alert("يرجى كتابة الاسم والعنوان!");
+            
+            let msg = `*طلب جديد - دبي ماركت*\n👤 ${name}\n📍 ${address}\n\n`;
             let hasItems = false;
             products.forEach(p => { if(cart[p.name]>0) { msg += `• ${p.name} (x${cart[p.name]})\n`; hasItems = true; }});
+            
             if(!hasItems) return alert("السلة فارغة!");
-            window.open(`https://wa.me/963955929797?text=${encodeURIComponent(msg)}`);
+            window.open(`https://wa.me/963965436980?text=${encodeURIComponent(msg)}`);
         }
         init();
     </script>
